@@ -7,7 +7,7 @@ from strategies import EMAStrat
 
 
 if __name__ == "__main__":
-    stock = "TCS"
+    stock = "ITC"
     df = pd.read_csv(
         f"hist_data/{stock}_data.csv",
         delimiter=",",

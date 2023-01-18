@@ -1,5 +1,6 @@
 import backtrader as bt
 
+
 class EMAStrat(bt.Strategy):
     def __init__(self):
         ema1 = bt.ind.EMA(period=5)
@@ -9,6 +10,9 @@ class EMAStrat(bt.Strategy):
         self.scnt = self.fcnt = 0
 
     def next(self):
+        if not self.position and self.datetime.datetime(0).hour >= 15:
+            return
+
         if not self.position:
             if self.price[0] > self.ema2[0] and self.crossover > 0:
                 self.bp = self.price[0]
@@ -17,6 +21,15 @@ class EMAStrat(bt.Strategy):
         else:
             sl = self.bp - 0.004 * self.bp
             tp = self.bp + 0.012 * self.bp
+
+            if self.datetime.datetime(0).hour >= 15:
+                chg = self.price[0] - self.bp
+                if chg > 0:
+                    self.scnt += 1
+                else:
+                    self.fcnt += 1
+                print(f"Mkt Close: {chg}")
+                self.sell()
 
             if self.price <= sl:
                 print(f"Stop Loss: {self.price[0]}")

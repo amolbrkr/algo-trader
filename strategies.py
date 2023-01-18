@@ -30,13 +30,11 @@ class EMAStrat(bt.Strategy):
                     self.fcnt += 1
                 print(f"Mkt Close: {chg}")
                 self.sell()
-
-            if self.price <= self.sl:
+            elif self.price <= self.sl:
                 print(f"Stop Loss: {self.price[0]}")
                 self.fcnt += 1
                 self.sell()
-
-            if self.price >= self.tp:
+            elif self.price >= self.tp:
                 print(f"Take Profit: {self.price[0]}")
                 self.scnt += 1
                 self.sell()

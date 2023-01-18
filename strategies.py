@@ -10,6 +10,7 @@ class EMAStrat(bt.Strategy):
         self.scnt = self.fcnt = 0
 
     def next(self):
+        print(f"{self.datetime.datetime(0)} - {self.price[0]}")
         if not self.position and self.datetime.datetime(0).hour >= 15:
             return
 

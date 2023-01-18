@@ -16,12 +16,11 @@ class EMAStrat(bt.Strategy):
         if not self.position:
             if self.price[0] > self.ema2[0] and self.crossover > 0:
                 self.bp = self.price[0]
-                print(f"Buy: {self.bp}")
+                self.sl = self.price[0] - 0.004 * self.price[0]
+                self.tp = self.price[0] + 0.012 * self.price[0]
+                print(f"Buy: {self.bp}, SL: {self.sl}, TP: {self.tp}")
                 self.buy()
         else:
-            sl = self.bp - 0.004 * self.bp
-            tp = self.bp + 0.012 * self.bp
-
             if self.datetime.datetime(0).hour >= 15:
                 chg = self.price[0] - self.bp
                 if chg > 0:
@@ -31,12 +30,12 @@ class EMAStrat(bt.Strategy):
                 print(f"Mkt Close: {chg}")
                 self.sell()
 
-            if self.price <= sl:
+            if self.price <= self.sl:
                 print(f"Stop Loss: {self.price[0]}")
                 self.fcnt += 1
                 self.sell()
 
-            if self.price >= tp:
+            if self.price >= self.tp:
                 print(f"Take Profit: {self.price[0]}")
                 self.scnt += 1
                 self.sell()

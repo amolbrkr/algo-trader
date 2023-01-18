@@ -83,11 +83,6 @@ if __name__ == "__main__":
         index_col="datetime",
         parse_dates=True,
     )
-
-    # Get last year's data
-    df = df["2023-01-01 07:00:00":"2023-01-17 07:00:00"]
-
-    cerebro = bt.Cerebro()
     data = bt.feeds.PandasData(
         name=f"{stock} 5 Min",
         dataname=df,
@@ -98,6 +93,8 @@ if __name__ == "__main__":
         sessionend=time(15, 25),
         tz=pytz.timezone("Asia/Kolkata"),
     )
+
+    cerebro = bt.Cerebro()
     cerebro.adddata(data)
     cerebro.broker.set_cash(10000)
     cerebro.broker.set_coc(True)

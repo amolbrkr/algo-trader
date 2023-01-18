@@ -19,9 +19,10 @@ if __name__ == "__main__":
                 index_col="datetime",
                 parse_dates=True,
             ),
+            compression=3,
             timeframe=bt.TimeFrame.Minutes,
             fromdate=datetime(2022, 1, 1),
-            todate=datetime(2023, 1, 1),
+            todate=datetime(2023, 1, 18),
             sessionstart=time(9, 5),
             sessionend=time(15, 25),
             tz=pytz.timezone("Asia/Kolkata"),
@@ -29,8 +30,8 @@ if __name__ == "__main__":
     )
     cb.broker.set_cash(10000)
     cb.addstrategy(EMAStrat)
-    cb.addsizer(bt.sizers.PercentSizer, percents=30)
+    cb.addsizer(bt.sizers.PercentSizer, percents=100)
     print(f"Starting Portfolio Value: {cb.broker.getvalue()}")
     cb.run()
     print(f"Final Portfolio Value: {cb.broker.getvalue()}")
-    cb.plot(style="candlestick")
+    # cb.plot(style="candlestick")

@@ -1,7 +1,7 @@
 import backtrader as bt
 
 
-class VWAP(bt.Indicator):
+class VolumeWeightedAveragePrice(bt.Indicator):
     plotinfo = dict(subplot=False)
     params = (("period", 30),)
     alias = (

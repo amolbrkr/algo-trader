@@ -56,4 +56,7 @@ class Utils:
         )[f"{start_dt} 07:00:00":f"{end_dt} 16:00:00"]
         res = res[["open", "high", "low", "close", "volume"]] if filter_cols else res
         res.columns = map(str.title, res.columns)
+        print(
+            f"Rows Loaded: {len(res.index)}, Min: {min(res.index)}, Max: {max(res.index)}"
+        )
         return res

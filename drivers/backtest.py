@@ -1,5 +1,5 @@
 import pandas as pd
-from utils.utils import Utils
+from ..utils import connect
 from strategies.strategies import TestStrat
 from backtesting import Backtest
 

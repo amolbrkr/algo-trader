@@ -1,41 +1,37 @@
-import time
-import pytz
 import pandas as pd
-import backtrader as bt
-from datetime import datetime, time
-from strategies import EMAStrat
+from backtesting import Backtest, Strategy
+from backtesting.lib import crossover
+
+from backtesting.test import SMA
+
+TCS = pd.read_csv(
+    f"hist_data/TCS_data.csv",
+    delimiter=",",
+    index_col="datetime",
+    parse_dates=True,
+)["2023-01-01 07:00:00":"2023-01-18 16:00:00"]
+
+TCS = TCS[["open", "high", "low", "close", "volume"]]
+TCS.columns = map(str.title, TCS.columns)
 
 
-if __name__ == "__main__":
-    stock = "TCS"
+class SmaCross(Strategy):
+    n1 = 10
+    n2 = 20
 
-    cb = bt.Cerebro()
-    cb.adddata(
-        # cb.resampledata(
-            bt.feeds.PandasData(
-                name=f"{stock} 5 Min",
-                dataname=pd.read_csv(
-                    f"hist_data/{stock}_data.csv",
-                    delimiter=",",
-                    index_col="datetime",
-                    parse_dates=True,
-                )["2022-01-01 07:00:00": "2023-01-18 16:00:00"],
-                timeframe=bt.TimeFrame.Minutes,
-                fromdate=datetime(2022, 1, 1),
-                todate=datetime(2023, 1, 18),
-                sessionstart=time(9, 5),
-                sessionend=time(15, 25),
-                tz=pytz.timezone("Asia/Kolkata"),
-            ),
-        #     timeframe=bt.TimeFrame.Minutes,
-        #     rightedge=False,
-        #     compression=1,
-        # )
-    )
-    cb.broker.set_cash(10000)
-    cb.addstrategy(EMAStrat)
-    cb.addsizer(bt.sizers.PercentSizer, percents=100)
-    print(f"Starting Portfolio Value: {cb.broker.getvalue()}")
-    cb.run()
-    print(f"Final Portfolio Value: {cb.broker.getvalue()}")
-    cb.plot(style="candlestick")
+    def init(self):
+        close = self.data.Close
+        self.sma1 = self.I(SMA, close, self.n1)
+        self.sma2 = self.I(SMA, close, self.n2)
+
+    def next(self):
+        if crossover(self.sma1, self.sma2):
+            self.buy()
+        elif crossover(self.sma2, self.sma1):
+            self.sell()
+
+
+bt = Backtest(TCS, SmaCross, cash=10000, commission=0.002, exclusive_orders=True)
+
+output = bt.run()
+bt.plot()

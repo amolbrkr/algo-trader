@@ -1,7 +1,6 @@
 import pandas as pd
-from backtesting.test import SMA
-from backtesting.lib import crossover
-from backtesting import Backtest, Strategy
+from strats import TestStrat
+from backtesting import Backtest
 
 
 TCS = pd.read_csv(
@@ -9,30 +8,13 @@ TCS = pd.read_csv(
     delimiter=",",
     index_col="datetime",
     parse_dates=True,
-)["2023-01-01 07:00:00":"2023-01-18 16:00:00"]
+)["2022-12-01 07:00:00":"2023-01-18 16:00:00"]
 
 TCS = TCS[["open", "high", "low", "close", "volume"]]
 TCS.columns = map(str.title, TCS.columns)
 
 
-class SmaCross(Strategy):
-    n1 = 10
-    n2 = 20
+bt = Backtest(TCS, TestStrat, cash=10000, commission=0.002, exclusive_orders=True)
 
-    def init(self):
-        close = self.data.Close
-        self.sma1 = self.I(SMA, close, self.n1)
-        self.sma2 = self.I(SMA, close, self.n2)
-
-    def next(self):
-        if crossover(self.sma1, self.sma2):
-            self.buy()
-        elif crossover(self.sma2, self.sma1):
-            self.sell()
-
-
-bt = Backtest(TCS, SmaCross, cash=10000, commission=0.002, exclusive_orders=True)
-
-output = bt.run()
-bt.plot()
-print(output)
+print(bt.run())
+# bt.plot()

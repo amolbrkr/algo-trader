@@ -2,6 +2,7 @@ import os
 import json
 import urllib
 import webbrowser
+import pandas as pd
 from datetime import datetime
 from breeze_connect import BreezeConnect
 
@@ -39,9 +40,20 @@ class ICICIConnector:
                 json.dump(self.session, sess_file)
 
         return self.__gen_session()
-    
+
     def connect_ws(self):
         self.breeze.ws_connect()
         return self.breeze
 
 
+class Utils:
+    def read_data(self, stock, start_dt, end_dt, filter_cols=True):
+        res = pd.read_csv(
+            f"hist_data/{stock}_data.csv",
+            delimiter=",",
+            index_col="datetime",
+            parse_dates=True,
+        )[f"{start_dt} 07:00:00":f"{end_dt} 16:00:00"]
+        res = res[["open", "high", "low", "close", "volume"]] if filter_cols else res
+        res.columns = map(str.title, res.columns)
+        return res

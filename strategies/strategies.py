@@ -19,6 +19,7 @@ class BaseStrat(Strategy):
 
 class TestStrat(BaseStrat):
     def init(self):
+        self.price = self.data.Close
         self.sma1 = self.I(SMA, self.price, 10)
         self.sma2 = self.I(SMA, self.price, 50)
 

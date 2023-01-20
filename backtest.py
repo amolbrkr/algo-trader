@@ -1,8 +1,8 @@
 import pandas as pd
-from backtesting import Backtest, Strategy
-from backtesting.lib import crossover
-
 from backtesting.test import SMA
+from backtesting.lib import crossover
+from backtesting import Backtest, Strategy
+
 
 TCS = pd.read_csv(
     f"hist_data/TCS_data.csv",
@@ -35,3 +35,4 @@ bt = Backtest(TCS, SmaCross, cash=10000, commission=0.002, exclusive_orders=True
 
 output = bt.run()
 bt.plot()
+print(output)

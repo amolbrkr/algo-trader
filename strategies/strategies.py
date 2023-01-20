@@ -1,6 +1,6 @@
-from backtesting.test import SMA
-from backtesting.lib import crossover
+import talib as ta
 from backtesting import Strategy
+from backtesting.lib import crossover
 
 
 class BaseStrat(Strategy):
@@ -13,15 +13,15 @@ class BaseStrat(Strategy):
             self.buy()
         else:
             self.sell()
-        # print(f"{order_type}: {price}, SL: {sl}, TP: {tp}")
+        print(f"{order_type}: {price}, SL: {sl}, TP: {tp}")
         return (price, sl, tp)
 
 
 class TestStrat(BaseStrat):
     def init(self):
         self.price = self.data.Close
-        self.sma1 = self.I(SMA, self.price, 10)
-        self.sma2 = self.I(SMA, self.price, 50)
+        self.sma1 = self.I(ta.EMA, self.price, 10)
+        self.sma2 = self.I(ta.EMA, self.price, 50)
 
     def next(self):
         if crossover(self.sma1, self.sma2):

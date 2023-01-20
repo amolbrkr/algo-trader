@@ -1,5 +1,5 @@
 import pandas as pd
-from strats import TestStrat
+from strategies.strategies import TestStrat
 from backtesting import Backtest
 
 

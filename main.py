@@ -1,5 +1,5 @@
-import connect
-import collect_data
+import utils.connect as connect
+import utils.collect_data as collect_data
 
 
 if __name__ == "__main__":

@@ -20,11 +20,25 @@ class BaseStrat(Strategy):
 class TestStrat(BaseStrat):
     def init(self):
         self.price = self.data.Close
-        self.sma1 = self.I(ta.EMA, self.price, 10)
-        self.sma2 = self.I(ta.EMA, self.price, 50)
+        self.rsi = self.I(ta.RSI, self.price, 14)
+        self.ema = self.I(ta.EMA, self.price, 5)
+        self.ema1 = self.I(ta.EMA, self.price, 15)
 
     def next(self):
-        if crossover(self.sma1, self.sma2):
-            self.execute("BUY", self.data.Close[-1])
-        elif crossover(self.sma2, self.sma1):
-            self.execute("SELL", self.data.Close[-1])
+        in_mkt = False
+        ltp = self.data.Close[-1]
+
+        if (
+            crossover(self.ema, self.ema1)
+            and self.rsi[-1] >= 40
+            and self.rsi[-1] <= 60
+            and self.rsi[-3] < self.rsi[-2]
+            and self.rsi[-2] < self.rsi[-1]
+        ):
+            self.bp, self.sl, self.tp = self.execute("BUY", ltp)
+            in_mkt = True
+
+        if in_mkt and (
+            self.data.index[-1].hour >= 15 or ltp <= self.sl or ltp >= self.tp
+        ):
+            self.sell()

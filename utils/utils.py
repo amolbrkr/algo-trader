@@ -1,33 +1,5 @@
+import pandas as pd
 import backtrader as bt
-
-
-class VolumeWeightedAveragePrice(bt.Indicator):
-    plotinfo = dict(subplot=False)
-    params = (("period", 30),)
-    alias = (
-        "VWAP",
-        "VolumeWeightedAveragePrice",
-    )
-    lines = ("VWAP",)
-    plotlines = dict(VWAP=dict(alpha=0.50, linestyle="-.", linewidth=2.0))
-
-    def __init__(self):
-        cumvol = bt.ind.SumN(self.data.volume, period=self.p.period)
-        typprice = (
-            (self.data.close + self.data.high + self.data.low) / 3
-        ) * self.data.volume
-        cumtypprice = bt.ind.SumN(typprice, period=self.p.period)
-        self.lines[0] = cumtypprice / cumvol
-        super(VolumeWeightedAveragePrice, self).__init__()
-
-
-class Logger:
-    def __init__(self, datas) -> None:
-        self.datas = datas
-
-    def log(self, txt):
-        dt = self.datas[0].datetime.date(0)
-        print(f"{dt.isoformat()}, {txt}")
 
 
 class Utils:
@@ -47,3 +19,14 @@ class Utils:
             obj.log("Order Canceled/Margin/Rejected")
 
         obj.order = None
+
+    def read_data(self, stock, start_dt, end_dt, filter_cols=True):
+        res = pd.read_csv(
+            f"hist_data/{stock}_data.csv",
+            delimiter=",",
+            index_col="datetime",
+            parse_dates=True,
+        )[f"{start_dt} 07:00:00":f"{end_dt} 16:00:00"]
+        res = res[["open", "high", "low", "close", "volume"]] if filter_cols else res
+        res.columns = map(str.title, res.columns)
+        return res

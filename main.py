@@ -1,8 +1,8 @@
 import argparse, sys
-from drivers import backtest
-from strategies import strategies
 from utils import connect
+from drivers import backtest
 from utils import collect_data
+from strategies import strategies
 
 
 if __name__ == "__main__":
@@ -13,6 +13,7 @@ if __name__ == "__main__":
     )
     arg_prsr.add_argument("-s", "--start", help="Start date of test (YYYY-MM-DD)")
     arg_prsr.add_argument("-e", "--end", help="End date of test (YYYY-MM-DD)")
+    arg_prsr.add_argument("-np", "--no_plot", help="No plotting")
     args = arg_prsr.parse_args()
 
     if args.get_hist:
@@ -33,4 +34,5 @@ if __name__ == "__main__":
             exclusive_orders=True,
         ).test
         print(bt.run())
-        bt.plot()
+        if not args.no_plot:
+            bt.plot()

@@ -3,20 +3,6 @@ from backtesting import Strategy
 from backtesting.lib import crossover
 
 
-class BaseStrat(Strategy):
-    def execute(self, order_type, price, sl_pcnt=0.004, tp_pcnt=0.012):
-        sl, tp = (
-            price - price * sl_pcnt if order_type == "BUY" else price + price * sl_pcnt,
-            price + price * tp_pcnt if order_type == "BUY" else price - price * tp_pcnt,
-        )
-        if order_type == "BUY":
-            self.buy()
-        else:
-            self.sell()
-        print(f"{order_type}: {price}, SL: {sl}, TP: {tp}")
-        return (price, sl, tp)
-
-
 class TestStrat(Strategy):
     def init(self):
         self.price = self.data.Close
@@ -39,7 +25,10 @@ class TestStrat(Strategy):
                 and self.rsi[-3] < self.rsi[-2]
                 and self.rsi[-2] < self.rsi[-1]
             ):
-                self.buy(sl=ltp - ltp * 0.004, tp=ltp + ltp * 0.012)
+                sl = ltp - ltp * 0.004
+                tp = ltp + ltp * 0.012
+
+                self.buy(sl=sl, tp=tp)
         else:
             if tm.hour >= 15:
                 self.trades[0].close()

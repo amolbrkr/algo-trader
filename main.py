@@ -17,7 +17,7 @@ if __name__ == "__main__":
     args = arg_prsr.parse_args()
 
     if args.get_hist:
-        stocks = sys.argv[2].split(",")  # ["HDFC", "ITC", "TCS"]
+        stocks = sys.argv[2].split(",")
         breeze = connect.ICICIConnector().connect()
         dc = collect_data.DataCollector(breeze)
         dc.get_stock_hist(stocks, "5minute", "2018-01-01", "2023-01-13")
@@ -35,4 +35,7 @@ if __name__ == "__main__":
         ).test
         print(bt.run())
         if not args.no_plot:
-            bt.plot()
+            try:
+                bt.plot(open_browser=False)
+            except Exception as e:
+                print(f"Plot Error: {e}")

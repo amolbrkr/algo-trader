@@ -12,21 +12,24 @@ class TestStrat(Strategy):
         self.atr = self.I(
             ta.ATR, self.data.High, self.data.Low, self.price, 14, plot=False
         )
-        self.ema = self.I(ta.EMA, self.price, 5)
-        self.ema1 = self.I(ta.EMA, self.price, 12)
+        self.ema = self.I(ta.EMA, self.price, 10)
+        self.ema1 = self.I(ta.EMA, self.price, 25)
 
     def next(self):
         ltp = self.data.Close[-1]
         tm = self.data.index[-1]
+        slope0 = math.degrees(math.atan(self.ema[-1] - self.ema[-2]))
         slope = math.degrees(math.atan(self.ema1[-1] - self.ema1[-2]))
-        print(f"{tm}: {slope}, {crossover(self.ema1, self.ema)}")
+        print(
+            f"{tm}: {slope}, {slope0 - slope}, {crossover(self.ema, self.ema1)}, {self.atr[-1]}"
+        )
 
         if not self.position and tm.hour >= 15:
             return
 
         if not self.position:
             if (
-                self.atr[-1] >= 2
+                self.atr[-1] >= 3.5
                 and slope >= 3
                 and self.rsi[-1] >= 40
                 and self.rsi[-1] <= 80
@@ -38,7 +41,7 @@ class TestStrat(Strategy):
                 self.buy(sl=sl, tp=tp)
                 print(f"BUY: {ltp}, SL: {sl}, TP: {tp}")
             elif (
-                self.atr[-1] >= 2
+                self.atr[-1] >= 3.5
                 and slope < 0
                 and self.rsi[-1] >= 40
                 and self.rsi[-1] <= 80

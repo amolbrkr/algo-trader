@@ -1,4 +1,6 @@
+import math
 import talib as ta
+import pandas as pd
 from backtesting import Strategy
 from backtesting.lib import crossover
 
@@ -13,23 +15,24 @@ class TestStrat(Strategy):
     def next(self):
         ltp = self.data.Close[-1]
         tm = self.data.index[-1]
+        slope = math.degrees(math.atan(self.ema1[-1] - self.ema1[-2]))
 
         if not self.position and tm.hour >= 15:
             return
 
         if not self.position:
             if (
-                crossover(self.ema, self.ema1)
+                (crossover(self.price, self.ema) or crossover(self.ema, self.ema1))
                 and self.rsi[-1] >= 40
-                and self.rsi[-1] <= 60
-                and self.rsi[-3] < self.rsi[-2]
-                and self.rsi[-2] < self.rsi[-1]
+                and self.rsi[-1] <= 80
+                and slope >= 3
             ):
-                sl = ltp - ltp * 0.004
-                tp = ltp + ltp * 0.012
+                sl = ltp - ltp * 0.005
+                tp = ltp + ltp * 0.015
 
                 self.buy(sl=sl, tp=tp)
+                print(f"BUY: {ltp}, SL: {sl}, TP: {tp}")
         else:
-            if tm.hour >= 15:
-                self.trades[0].close()
+            if tm.hour >= 15 or crossover(self.ema1, self.ema):
+                self.position.close()
                 print(f"Mkt Close: {ltp}")

@@ -49,9 +49,9 @@ class ICICIConnector:
 
 
 class Utils:
-    def read_data(self, stock, start_dt, end_dt, filter_cols=True):
+    def read_data(self, stock, time_period, start_dt, end_dt, filter_cols=True):
         res = pd.read_csv(
-            f"hist_data/{stock}_data.csv",
+            f"hist_data/{stock}_{time_period}_data.csv",
             delimiter=",",
             index_col="datetime",
             parse_dates=True,

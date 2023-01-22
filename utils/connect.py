@@ -23,7 +23,9 @@ class ICICIConnector:
     def connect(self):
         today = datetime.now().strftime("%d-%m-%Y")
         self.session = (
-            json.load(open("session.json")) if os.path.exists("session.json") else None
+            json.load(open(os.path.join(os.getcwd(), "session.json")))
+            if os.path.exists("session.json")
+            else None
         )
         if not self.session or self.session["generate_ts"] != today:
             webbrowser.open(

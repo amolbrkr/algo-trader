@@ -34,6 +34,8 @@ if __name__ == "__main__":
             exclusive_orders=True,
         ).test
         print(bt.run())
+        # df = pd.DataFrame(out._strategy.slope_vals)
+        # print(f"Min: {min(df['slope'])}, Max: {max(df['slope'])}")
         if not args.no_plot:
             try:
                 bt.plot(open_browser=False)

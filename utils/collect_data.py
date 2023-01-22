@@ -25,14 +25,14 @@ class DataCollector:
             )
 
             if "Success" in res.keys():
-                print(res)
+                print(res.get("Status"))
                 self.store[stock] = {
                     "data": pd.DataFrame(res["Success"]),
                     "interval": interval,
                 }
-                print(f"Len: {len(self.store[stock].index)}")
-                print(f"Min: {min(self.store[stock]['datetime'])}")
-                print(f"Max: {max(self.store[stock]['datetime'])}")
+                print(f"Len: {len(self.store[stock]['data'].index)}")
+                print(f"Min: {min(self.store[stock]['data']['datetime'])}")
+                print(f"Max: {max(self.store[stock]['data']['datetime'])}")
 
     def dump_to_csv(self, stock):
         if stock not in self.store.keys():

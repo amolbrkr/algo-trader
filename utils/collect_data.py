@@ -1,6 +1,6 @@
 import time
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class DataCollector:
@@ -9,49 +9,45 @@ class DataCollector:
         self.breeze = breeze
 
     def get_stock_hist(self, stock_list, interval, start_dt, end_dt):
-        stock_code = self.breeze.get_names(exchange_code="NSE", stock_code="TATASTEEL")
-        print(stock_code)
-        res = self.breeze.get_historical_data(
-            interval="30minute",
-            from_date=f"2015-01-01T09:00:00.000Z",
-            to_date=f"2023-01-24T15:30:00.000Z",
-            stock_code=stock_code["isec_stock_code"],
-            exchange_code="NSE",
-            product_type="cash",
-        )
-        print(res["Status"], res["Error"], res.get("Success"))
-        print(len(res["Success"].index))
-        exit()
-
-        res = list()
-        start = datetime.strptime(start_dt, "%Y-%m-%d")
-        end = datetime.strptime(end_dt, "%Y-%m-%d")
+        fmt = "%Y-%m-%d"
+        num_days = timedelta(days=1000 // (375 // int(interval[:2])))
+        start = datetime.strptime(start_dt, fmt)
+        end = datetime.strptime(end_dt, fmt)
 
         for stock in stock_list:
+            print(stock)
+            stock_data = res = list()
+            stk_nm = self.breeze.get_names(exchange_code="NSE", stock_code=stock)
             try:
-                print(stock)
-                res = self.breeze.get_historical_data_v2(
-                    interval=interval,
-                    from_date=f"{start_dt}T09:00:00.000Z",
-                    to_date=f"{end_dt}T16:00:00.000Z",
-                    stock_code=stock,
-                    exchange_code="NSE",
-                    product_type="cash",
-                )
+                cut_off = start + num_days
+                while cut_off < end:
+                    print(f"Fetching {start} - {cut_off}")
+                    res = self.breeze.get_historical_data_v2(
+                        interval=interval,
+                        from_date=f"{start.strftime(fmt)}T09:00:00.000Z",
+                        to_date=f"{cut_off.strftime(fmt)}T16:00:00.000Z",
+                        stock_code=stk_nm["isec_stock_code"],
+                        exchange_code="NSE",
+                        product_type="cash",
+                    )
 
-                print(f"Status: {res['Status']}, Error: {res['Error']}")
-                if "Success" in res.keys():
-                    self.store[stock] = {
-                        "data": pd.DataFrame(res["Success"]),
-                        "interval": interval,
-                    }
-                    print(f"Len: {len(self.store[stock]['data'].index)}")
-                    print(f"Min: {min(self.store[stock]['data']['datetime'])}")
-                    print(f"Max: {max(self.store[stock]['data']['datetime'])}")
-                    print(f"---------")
+                    print(f"Status: {res['Status']}, Error: {res['Error']}")
+                    if "Success" in res.keys():
+                        stock_data.extend(res["Success"])
+                        print(f"Done, total records: {len(stock_data)}.")
+                    start = cut_off
+                    cut_off += num_days
             except Exception as e:
                 print(f"Fetch Error: {e}")
                 continue
+            self.store[stock] = {
+                "data": pd.DataFrame(res["Success"]),
+                "interval": interval,
+            }
+            print(f"Len: {len(self.store[stock]['data'].index)}")
+            print(f"Min: {min(self.store[stock]['data']['datetime'])}")
+            print(f"Max: {max(self.store[stock]['data']['datetime'])}")
+            print(f"---------")
 
     def dump_to_csv(self, stock):
         if stock not in self.store.keys():

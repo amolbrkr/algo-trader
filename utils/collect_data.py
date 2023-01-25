@@ -32,16 +32,23 @@ class DataCollector:
                     )
 
                     print(f"Status: {res['Status']}, Error: {res['Error']}")
-                    if "Success" in res.keys():
+                    if res["Status"] == 429:
+                        time.sleep(90)
+                        cut_off -= num_days
+                        start = cut_off
+
+                    if res["Status"] == 200 and "Success" in res.keys():
                         stock_data.extend(res["Success"])
                         print(f"Done, total records: {len(stock_data)}.")
+                    else:
+                        print("No success node!")
                     start = cut_off
                     cut_off += num_days
             except Exception as e:
                 print(f"Fetch Error: {e}")
                 continue
             self.store[stock] = {
-                "data": pd.DataFrame(res["Success"]),
+                "data": pd.DataFrame(stock_data),
                 "interval": interval,
             }
             print(f"Len: {len(self.store[stock]['data'].index)}")

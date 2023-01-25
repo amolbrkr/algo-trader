@@ -20,7 +20,7 @@ class DataCollector:
             stk_nm = self.breeze.get_names(exchange_code="NSE", stock_code=stock)
             try:
                 cut_off = start + num_days
-                while cut_off < end:
+                while start < end:
                     print(f"Fetching {start} - {cut_off}")
                     res = self.breeze.get_historical_data_v2(
                         interval=interval,
